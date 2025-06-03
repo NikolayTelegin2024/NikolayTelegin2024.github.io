@@ -1,5 +1,4 @@
 const API_KEY = 'ba88cd2ed0084669ae127eecb33d58c9';
-const CACHE_TIME = 7000000; // ~2 часа
 
 document.addEventListener('DOMContentLoaded', () => {
     initTheme();
@@ -74,27 +73,20 @@ async function fetchUCLTables() {
 async function fetchWithCache(cacheKey, url) {
     // Проверяем доступность localStorage
     const storageAvailable = isStorageAvailable();
-    let cachedData = null;
-    let cacheTime = null;
     
+    // Пытаемся получить данные из кэша
     if (storageAvailable) {
         try {
-            cachedData = localStorage.getItem(cacheKey);
-            cacheTime = localStorage.getItem(`${cacheKey}_time`);
-            
-            // Если есть кэш и он не устарел
-            if (cachedData && cacheTime) {
-                const timeDiff = Date.now() - parseInt(cacheTime, 10);
-                if (timeDiff < CACHE_TIME) {
-                    return JSON.parse(cachedData);
-                }
+            const cachedData = localStorage.getItem(cacheKey);
+            if (cachedData) {
+                return JSON.parse(cachedData);
             }
         } catch (e) {
             console.error('Ошибка чтения кэша:', e);
         }
     }
     
-    // Запрос к API
+    // Если в кэше нет данных - делаем запрос к API
     const response = await fetch(url, {
         headers: {
             'X-Auth-Token': API_KEY,
@@ -113,7 +105,6 @@ async function fetchWithCache(cacheKey, url) {
     if (storageAvailable) {
         try {
             localStorage.setItem(cacheKey, JSON.stringify(data));
-            localStorage.setItem(`${cacheKey}_time`, Date.now().toString());
         } catch (e) {
             console.error('Ошибка сохранения кэша:', e);
         }
@@ -135,7 +126,7 @@ function isStorageAvailable() {
 
 function displayLeagueTable(data, container, leagueName) {
     if (!data?.standings?.[0]?.table) {
-        container.innerHTML = `<p class="error">Данные таблицы не найдены</p>`;
+        container.innerHTML = '<p class="error">Данные таблицы не найдены</p>';
         return;
     }
 
@@ -186,14 +177,14 @@ function displayLeagueTable(data, container, leagueName) {
         `;
     });
 
-    html += `</tbody></table>`;
+    html += '</tbody></table>';
     html += `<p class="update-time">Обновлено: ${new Date().toLocaleString()}</p>`;
     container.innerHTML = html;
 }
 
 function displayUCLTables(data, container) {
     if (!data?.standings || data.standings.length === 0) {
-        container.innerHTML = `<p class="error">Данные Лиги Чемпионов не найдены</p>`;
+        container.innerHTML = '<p class="error">Данные Лиги Чемпионов не найдены</p>';
         return;
     }
 
@@ -250,7 +241,7 @@ function displayUCLTables(data, container) {
             `;
         });
 
-        html += `</tbody></table></div>`;
+        html += '</tbody></table></div>';
     });
 
     html += `<p class="update-time">Обновлено: ${new Date().toLocaleString()}</p>`;
@@ -265,7 +256,7 @@ function handleDataError(error, container, cacheKey) {
         try {
             const cachedData = localStorage.getItem(cacheKey);
             if (cachedData) {
-                container.innerHTML = `<p class="error">Ошибка загрузки свежих данных. Показаны сохранённые данные.</p>`;
+                container.innerHTML = '<p class="error">Ошибка загрузки свежих данных. Показаны сохранённые данные.</p>';
                 if (cacheKey === 'laligaStandings') {
                     displayLeagueTable(JSON.parse(cachedData), container, 'La Liga');
                 } else {
