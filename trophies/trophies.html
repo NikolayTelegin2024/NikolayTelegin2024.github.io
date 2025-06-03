@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Реал Мадрид - Трофеи</title>
+    <link rel="stylesheet" href="trophies.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta name="description" content="Все трофеи Реал Мадрида - история побед Королевского клуба">
+</head>
+<body>
+    <a href="../index.html" class="home-button">На Главную</a>
+    <button id="theme-toggle" class="theme-toggle" aria-label="Переключить тему">
+        <span class="theme-icon">🌓</span>
+    </button>
+    <div class="trophy-section">
+        <h1>Трофеи Реал Мадрид</h1>
+        
+        <!-- Добавлен раздел для графика -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <h2>История успеха Королевского клуба в цифрах</h2>
+            </div>
+            <canvas id="trophies-chart"></canvas>
+        </div>
+
+        <div class="trophy-category">
+            <h2>Международные трофеи</h2>
+            <div class="trophy-grid" id="international-trophies">
+                <!-- Заполняется через JS -->
+            </div>
+        </div>
+        
+        <div class="trophy-category">
+            <h2>Национальные трофеи</h2>
+            <div class="trophy-grid" id="domestic-trophies">
+                <!-- Заполняется через JS -->
+            </div>
+        </div>
+    </div>
+
+    <script src="trophies.js"></script>
+</body>
+</html>

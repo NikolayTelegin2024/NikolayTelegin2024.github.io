@@ -1,0 +1,416 @@
+/* Основные переменные цветов - используем те же, что и в главном файле */
+:root {
+    --rm-red: rgba(164, 0, 0, 1);
+    --rm-dark-red: rgba(112, 28, 28, 1);
+    --rm-gold: rgba(255, 215, 0, 1);
+    --rm-light-gold: rgba(254, 190, 16, 1);
+    --rm-dark: rgba(10, 10, 10, 1);
+    --rm-light: rgba(242, 242, 242, 1);
+    --rm-bg: rgba(255, 255, 255, 1);
+    --rm-text: rgba(51, 51, 51, 1);
+    --rm-card-bg: rgba(255, 255, 255, 1);
+    --rm-nav-bg: rgba(0, 0, 0, 0.5);
+    --rm-footer-text: rgba(255, 255, 255, 1);
+    
+    /* Дополнительные цвета для страницы игроков */
+    --rm-blue: rgba(0, 82, 159, 1);
+    --rm-dark-blue: rgba(0, 51, 102, 1);
+    --rm-border: rgba(221, 221, 221, 1);
+    --rm-secondary-text: rgba(102, 102, 102, 1);
+    --rm-shadow: rgba(0, 0, 0, 0.1);
+    --rm-light-gray: rgba(224, 224, 224, 1);
+}
+
+[data-theme="dark"] {
+    --rm-dark: rgba(56, 43, 43, 1);
+    --rm-light: rgba(18, 18, 18, 1);
+    --rm-bg: rgba(26, 26, 26, 1);
+    --rm-text: rgba(224, 224, 224, 1);
+    --rm-card-bg: rgba(36, 36, 36, 1);
+    --rm-nav-bg: rgba(0, 0, 0, 0.7);
+    --rm-footer-text: rgba(9, 8, 8, 1);
+    
+    /* Дополнительные цвета для темной темы */
+    --rm-border: rgba(70, 70, 70, 1);
+    --rm-secondary-text: rgba(170, 170, 170, 1);
+    --rm-shadow: rgba(0, 0, 0, 0.3);
+    --rm-light-gray: rgba(60, 60, 60, 1);
+}
+
+/* Общие стили - используем тот же шрифт, что и на главной */
+body {
+    font-family: 'Univers', sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    background-color: var(--rm-bg);
+    color: var(--rm-text);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    position: relative;
+}
+
+/* Кнопка "На главную" - стилизуем в соответствии с главной страницей */
+.home-button {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    padding: 10px 15px;
+    background: linear-gradient(135deg, var(--rm-gold), var(--rm-light-gold));
+    color: var(--rm-dark);
+    text-decoration: none;
+    border-radius: 30px;
+    font-weight: bold;
+    z-index: 1000;
+    box-shadow: 0 2px 5px var(--rm-shadow);
+    transition: all 0.3s ease;
+}
+
+.home-button:hover {
+    background: linear-gradient(135deg, var(--rm-red), var(--rm-dark-red));
+    color: rgba(255, 255, 255, 1);
+    transform: translateY(-2px);
+}
+
+/* Заголовки - стилизуем как на главной странице */
+h1, h2, h3 {
+    font-weight: 700;
+    margin: 0 0 1rem 0;
+}
+
+h1 {
+    font-size: 2.5rem;
+    color: var(--rm-red);
+    text-align: center;
+    margin-bottom: 2rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    font-size: 2rem;
+    color: var(--rm-red);
+    border-bottom: 2px solid var(--rm-gold);
+    padding-bottom: 0.5rem;
+}
+
+h3 {
+    font-size: 1.5rem;
+    color: var(--rm-dark-red);
+}
+
+/* Карточка игрока - используем grid и стили главной страницы */
+.player-card {
+    background-color: var(--rm-card-bg);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+}
+
+.player-card:hover {
+    transform: translateY(-5px);
+}
+
+.player-header {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+    align-items: center;
+}
+
+.player-photos {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.player-photos img {
+    width: 150px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 3px solid var(--rm-gold);
+}
+
+.player-info {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.player-info h2 {
+    color: var(--rm-red);
+    margin: 0;
+    font-size: 2rem;
+}
+
+.player-number {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--rm-gold);
+    background-color: var(--rm-red);
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+.player-country {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.country-flag {
+    width: 24px;
+    height: 16px;
+    border: 1px solid var(--rm-border);
+    border-radius: 2px;
+}
+
+/* Секции информации - используем grid */
+.player-stats, .player-trophies, .player-description {
+    margin-bottom: 1.5rem;
+}
+
+.player-stats h3, .player-trophies h3, .player-description h3 {
+    color: var(--rm-dark-red);
+    border-bottom: 2px solid var(--rm-gold);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Статистика - grid layout */
+.stats-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.stat-item {
+    background-color: var(--rm-light);
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 4px var(--rm-shadow);
+    transition: transform 0.3s ease;
+}
+
+.stat-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px var(--rm-shadow);
+}
+
+.stat-name {
+    font-weight: bold;
+    color: var(--rm-dark-red);
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.stat-value {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--rm-text);
+}
+
+/* Трофеи - grid layout */
+.trophies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+}
+
+.trophy-item {
+    text-align: center;
+    background-color: var(--rm-light);
+    border-radius: 8px;
+    padding: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.trophy-item:hover {
+    transform: scale(1.05);
+}
+
+.trophy-item img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+}
+
+.trophy-item p {
+    margin: 0.5rem 0 0;
+    font-size: 0.8rem;
+    color: var(--rm-text);
+}
+
+/* Навигация между игроками */
+.nav-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.nav-button {
+    padding: 0.8rem;
+    border-radius: 30px;
+    font-weight: 600;
+    text-decoration: none;
+    color: white;
+    transition: all 0.3s ease;
+    text-align: center;
+    background: linear-gradient(135deg, var(--rm-red), var(--rm-dark-red));
+    border: none;
+    cursor: pointer;
+}
+
+.nav-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px var(--rm-shadow);
+}
+
+/* Список игроков */
+.player-list {
+    margin-top: 3rem;
+}
+
+.player-categories {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.category-btn {
+    padding: 0.8rem 1.5rem;
+    border-radius: 25px;
+    background-color: var(--rm-light);
+    color: var(--rm-text);
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.category-btn.active, .category-btn:hover {
+    background: linear-gradient(135deg, var(--rm-gold), var(--rm-light-gold));
+    color: var(--rm-dark);
+}
+
+.players-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.5rem;
+}
+
+.player-item {
+    background-color: var(--rm-card-bg);
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 2px 4px var(--rm-shadow);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.player-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px var(--rm-shadow);
+    background: linear-gradient(135deg, var(--rm-red), var(--rm-dark-red));
+    color: white;
+}
+.theme-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--rm-gold), var(--rm-light-gold));
+    border: none;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1);
+}
+
+.theme-icon {
+    font-size: 1.5em;
+}
+/* Адаптивность */
+@media (max-width: 1024px) {
+    .player-header {
+        grid-template-columns: 1fr;
+    }
+    
+    .player-photos {
+        justify-content: center;
+    }
+    
+    .stats-content {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1.5rem;
+    }
+    
+    .player-photos img {
+        width: 120px;
+        height: 160px;
+    }
+    
+    .trophies-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    }
+    
+    .players-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 1rem;
+    }
+    
+    .player-photos {
+        grid-template-columns: 1fr;
+    }
+    
+    .player-photos img {
+        width: 100%;
+        height: auto;
+        max-height: 200px;
+    }
+    
+    .stats-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .players-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .nav-buttons {
+        grid-template-columns: 1fr;
+    }
+}
