@@ -1,22 +1,18 @@
-const API_KEY = 'ba88cd2ed0084669ae127eecb33d58c9'; // Замените на ваш ключ
-const CACHE_TIME = 7000000; // 1 час
+const API_KEY = 'ba88cd2ed0084669ae127eecb33d58c9';
+const CACHE_TIME = 7000000; // ~2 часа
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Инициализация табов
+    initTheme();
     initTabs();
     
-    // Загрузка данных при открытии соответствующей вкладки
-    document.querySelector('.tab-button[data-tab="laliga"]').addEventListener('click', () => {
-        fetchLaLigaTable();
-    });
-    
-    document.querySelector('.tab-button[data-tab="ucl"]').addEventListener('click', () => {
-        fetchUCLTables();
-    });
+    // Загрузка данных при открытии вкладки
+    document.querySelector('.tab-button[data-tab="laliga"]').addEventListener('click', fetchLaLigaTable);
+    document.querySelector('.tab-button[data-tab="ucl"]').addEventListener('click', fetchUCLTables);
     
     // Загружаем данные для активной вкладки
     fetchLaLigaTable();
 });
+
 function toggleTheme() {
     const currentTheme = document.documentElement.getAttribute('data-theme');
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
@@ -24,12 +20,10 @@ function toggleTheme() {
     document.documentElement.setAttribute('data-theme', newTheme);
     localStorage.setItem('theme', newTheme);
     
-    // Обновляем иконку
     const themeIcon = document.querySelector('.theme-icon');
     themeIcon.textContent = newTheme === 'dark' ? '🌞' : '🌙';
 }
 
-// Инициализация темы при загрузке
 function initTheme() {
     const savedTheme = localStorage.getItem('theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
@@ -37,25 +31,16 @@ function initTheme() {
     const themeIcon = document.querySelector('.theme-icon');
     themeIcon.textContent = savedTheme === 'dark' ? '🌞' : '🌙';
     
-    // Добавляем обработчик события
-    const themeToggle = document.getElementById('theme-toggle');
-    themeToggle.addEventListener('click', toggleTheme);
+    document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
 }
 
-// Вызываем инициализацию темы при загрузке DOM
-document.addEventListener('DOMContentLoaded', () => {
-    initTheme();
-    // Остальной существующий код...
-});
 function initTabs() {
     const tabs = document.querySelectorAll('.tab-button');
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
-            // Убираем активный класс у всех кнопок и контента
             document.querySelectorAll('.tab-button').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             
-            // Добавляем активный класс к выбранной вкладке
             tab.classList.add('active');
             document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
         });
@@ -64,41 +49,49 @@ function initTabs() {
 
 async function fetchLaLigaTable() {
     const container = document.getElementById('laliga-table-container');
-    const cacheKey = 'laligaStandings';
+    container.innerHTML = '<p class="loading">Загрузка данных Ла Лиги...</p>';
     
     try {
-        const data = await fetchWithCache(
-            'https://api.football-data.org/v4/competitions/PD/standings',
-            cacheKey
-        );
+        const data = await fetchWithCache('laligaStandings', 'https://api.football-data.org/v4/competitions/PD/standings');
         displayLeagueTable(data, container, 'La Liga');
     } catch (error) {
-        handleDataError(error, container, cacheKey);
+        handleDataError(error, container, 'laligaStandings');
     }
 }
 
 async function fetchUCLTables() {
     const container = document.getElementById('ucl-table-container');
-    const cacheKey = 'uclStandings';
+    container.innerHTML = '<p class="loading">Загрузка данных Лиги Чемпионов...</p>';
     
     try {
-        const data = await fetchWithCache(
-            'https://api.football-data.org/v4/competitions/CL/standings',
-            cacheKey
-        );
+        const data = await fetchWithCache('uclStandings', 'https://api.football-data.org/v4/competitions/CL/standings');
         displayUCLTables(data, container);
     } catch (error) {
-        handleDataError(error, container, cacheKey);
+        handleDataError(error, container, 'uclStandings');
     }
 }
 
-async function fetchWithCache(url, cacheKey) {
-    // Проверка кэша
-    const cachedData = localStorage.getItem(cacheKey);
-    const lastUpdated = localStorage.getItem(`${cacheKey}_time`);
+async function fetchWithCache(cacheKey, url) {
+    // Проверяем доступность localStorage
+    const storageAvailable = isStorageAvailable();
+    let cachedData = null;
+    let cacheTime = null;
     
-    if (cachedData && lastUpdated && (Date.now() - lastUpdated < CACHE_TIME)) {
-        return JSON.parse(cachedData);
+    if (storageAvailable) {
+        try {
+            cachedData = localStorage.getItem(cacheKey);
+            cacheTime = localStorage.getItem(`${cacheKey}_time`);
+            
+            // Если есть кэш и он не устарел
+            if (cachedData && cacheTime) {
+                const timeDiff = Date.now() - parseInt(cacheTime, 10);
+                if (timeDiff < CACHE_TIME) {
+                    return JSON.parse(cachedData);
+                }
+            }
+        } catch (e) {
+            console.error('Ошибка чтения кэша:', e);
+        }
     }
     
     // Запрос к API
@@ -111,16 +104,33 @@ async function fetchWithCache(url, cacheKey) {
     
     if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || `HTTP error: ${response.status}`);
+        throw new Error(error.message || `Ошибка HTTP: ${response.status}`);
     }
     
     const data = await response.json();
     
-    // Сохранение в кэш
-    localStorage.setItem(cacheKey, JSON.stringify(data));
-    localStorage.setItem(`${cacheKey}_time`, Date.now());
+    // Сохраняем в кэш
+    if (storageAvailable) {
+        try {
+            localStorage.setItem(cacheKey, JSON.stringify(data));
+            localStorage.setItem(`${cacheKey}_time`, Date.now().toString());
+        } catch (e) {
+            console.error('Ошибка сохранения кэша:', e);
+        }
+    }
     
     return data;
+}
+
+function isStorageAvailable() {
+    try {
+        const testKey = '__storage_test__';
+        localStorage.setItem(testKey, testKey);
+        localStorage.removeItem(testKey);
+        return true;
+    } catch (e) {
+        return false;
+    }
 }
 
 function displayLeagueTable(data, container, leagueName) {
@@ -161,7 +171,7 @@ function displayLeagueTable(data, container, leagueName) {
                     <img src="${team.team.crest || 'https://via.placeholder.com/20'}" 
                          alt="${team.team.name}" 
                          height="20" 
-                         onerror="this.src='https://via.placeholder.com/20'">
+                         onerror="this.onerror=null;this.src='https://via.placeholder.com/20'">
                     ${team.team.shortName || team.team.name}
                 </td>
                 <td>${team.playedGames}</td>
@@ -225,7 +235,7 @@ function displayUCLTables(data, container) {
                         <img src="${team.team.crest || 'https://via.placeholder.com/20'}" 
                              alt="${team.team.name}" 
                              height="20" 
-                             onerror="this.src='https://via.placeholder.com/20'">
+                             onerror="this.onerror=null;this.src='https://via.placeholder.com/20'">
                         ${team.team.shortName || team.team.name}
                     </td>
                     <td>${team.playedGames}</td>
@@ -250,15 +260,23 @@ function displayUCLTables(data, container) {
 function handleDataError(error, container, cacheKey) {
     console.error('Ошибка:', error);
     
-    const cachedData = localStorage.getItem(cacheKey);
-    if (cachedData) {
-        container.innerHTML = `<p class="error">Ошибка загрузки свежих данных. Показаны сохранённые данные.</p>`;
-        if (cacheKey === 'laligaStandings') {
-            displayLeagueTable(JSON.parse(cachedData), container, 'La Liga');
-        } else {
-            displayUCLTables(JSON.parse(cachedData), container);
+    // Пытаемся показать кэшированные данные
+    if (isStorageAvailable()) {
+        try {
+            const cachedData = localStorage.getItem(cacheKey);
+            if (cachedData) {
+                container.innerHTML = `<p class="error">Ошибка загрузки свежих данных. Показаны сохранённые данные.</p>`;
+                if (cacheKey === 'laligaStandings') {
+                    displayLeagueTable(JSON.parse(cachedData), container, 'La Liga');
+                } else {
+                    displayUCLTables(JSON.parse(cachedData), container);
+                }
+                return;
+            }
+        } catch (e) {
+            console.error('Ошибка доступа к кэшу:', e);
         }
-    } else {
-        container.innerHTML = `<p class="error">${error.message || 'Не удалось загрузить данные. Попробуйте позже.'}</p>`;
     }
+    
+    container.innerHTML = `<p class="error">${error.message || 'Не удалось загрузить данные. Попробуйте позже.'}</p>`;
 }
